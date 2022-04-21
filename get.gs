@@ -102,5 +102,32 @@ function getUsers(sheet, page, limit, search){
     return ContentService.createTextOutput(result).setMimeType(ContentService.MimeType.JSON);
   }
 //end
+function doGet(e) {
+ var page = e.parameter.page || 1;
+  var limit = e.parameter.limit || 10;
+  var search = e.parameter.search || "";
+  var ss = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/10S8Igzt1tpqUBgJHVKpny-2s6G3Y3-vFsLMvlZVqpkc/edit#gid=810612111");
+  var sheet = ss.getSheetByName("list_film");
+  return getUsers(sheet, page, limit, search);
+}
+
+function getUsers(sheet, page, limit, search){
+  var rows = sheet.getDataRange().getDisplayValues().filter(([,,c]) => c == search);
+  var dataArray = rows.splice(limit * (page - 1), limit).reduce((ar, [a, b, c, d]) => ar.concat({id: a, year: b, title: c, img: d}), []);
+  var jo = {};
+  jo.user = dataArray;
+  var result = JSON.stringify(jo);
+  return ContentService.createTextOutput(result).setMimeType(ContentService.MimeType.JSON);
+}
+//end but for reverse you have to use this below code in place
+ function getUsers(sheet, page, limit, search){
+    var rows = sheet.getDataRange().getValues().slice(1).filter(([,,c]) => c == search).reverse();
+    var dataArray = rows.splice(limit * (page - 1), limit).reduce((ar, [a, b, c, d]) => ar.concat({id: a, year: b, title: c, img: d}), []);
+    var jo = {};
+    jo.user = dataArray;
+    var result = JSON.stringify(jo);
+    return ContentService.createTextOutput(result).setMimeType(ContentService.MimeType.JSON);
+  }
+
 
 
